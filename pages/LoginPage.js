@@ -6,6 +6,7 @@ export class LoginPage {
     this.password = page.getByLabel('Password');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.errorMessage = page.locator('#error');
+    this.successMessage = page.getByText("Congratulations student. You successfully logged in!");
   }
   //método para abrir pagina de login
   async goto() {

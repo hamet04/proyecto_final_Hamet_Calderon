@@ -1,27 +1,21 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../../pages/LoginPage";
+import { test, expect } from "../fixtures";
 
 test.describe("Autenticación", () => {
-  let loginPage;
-  test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPage(page);
-    await loginPage.goto();
-  });
-  test("inicio de sesion", async () => {
-    await loginPage.login(process.env.LOGIN_USER, process.env.LOGIN_PASSWORD);
+   test("inicio de sesion", async ({ loginPage, credentials }) => {
+    await loginPage.login(credentials.username, credentials.password);
     await expect(loginPage.page).toHaveURL("/logged-in-successfully/");
-    await expect(loginPage.page.getByText("Congratulations student. You successfully logged in!")).toBeVisible();
+    await expect(loginPage.successMessage).toBeVisible();
     await expect(loginPage.page.getByRole("link", { name: "Log out" })).toBeVisible();
   });
 
-  test("usuario inválido", async () => {
-    await loginPage.login("incorrectUser", process.env.LOGIN_PASSWORD);
+  test("usuario inválido", async ({ loginPage, credentials }) => {
+    await loginPage.login("incorrectUser", credentials.password);
     await expect(loginPage.errorMessage).toHaveText( "Your username is invalid!");
     await expect(loginPage.page).toHaveURL(/practice-test-login/);
   });
 
-  test("contraseña inválida", async () => {
-    await loginPage.login(process.env.LOGIN_USER, "incorrectPassword");
+  test("contraseña inválida", async ({ loginPage, credentials }) => {
+    await loginPage.login(credentials.username, "incorrectPassword");
     await expect(loginPage.errorMessage).toHaveText( "Your password is invalid!");
     await expect(loginPage.errorMessage).not.toContainText("username");
   });
