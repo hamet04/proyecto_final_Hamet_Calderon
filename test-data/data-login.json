@@ -1,0 +1,28 @@
+[
+  {
+    "id": "CP-AUTH-02",
+    "name": "Usuario inválido muestra mensaje de error",
+    "username": "incorrectUser",
+    "password": "incorrectPassword",
+    "error": "Your username is invalid!"
+  },
+  {
+    "id": "CP-AUTH-03",
+    "name": "Usuario contraseña invalida muestra mensaje de error",
+    "password": "incorrectPassword",
+    "error": "Your password is invalid!"
+  },
+  {
+    "id": "CP-AUTH-05",
+    "name": "Usuario vacío muestra mensaje de error",
+    "username": "",
+    "password": "incorrectPassword",
+    "error": "Your username is invalid!"
+  },
+  {
+    "id": "CP-AUTH-06",
+    "name": "Contraseña vacía muestra mensaje de error",
+    "password": "",
+    "error": "Your password is invalid!"
+  }
+]

@@ -17,6 +17,11 @@ export const test = base.extend({
       password: process.env.LOGIN_PASSWORD
     });
   },
+  loggedInPage: async ({ page, loginPage, credentials }, use) => {
+    await loginPage.login(credentials.username, credentials.password);
+    await expect(page).toHaveURL(/logged-in-successfully/);
+    await use(page);
+  },
   homePage: async ({ page }, use) => {
     const homePage = new HomePage(page);
     await homePage.goto();
