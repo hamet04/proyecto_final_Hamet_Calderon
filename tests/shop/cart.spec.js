@@ -1,7 +1,7 @@
 import { test, expect } from "../fixtures";
 
 test.use({ baseURL: process.env.SHOP_URL });
-const productName = "Thor Hammer";
+const productName = ["Thor Hammer", "Black Panther", "Iron Man Suit", "Captain America Shield", "Spider-Man Suit", "Hulk Buster"];
 
 test.describe("Tienda Virtual", () => {
   test("Agregar un producto al carrito", async ({

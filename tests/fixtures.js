@@ -12,6 +12,11 @@ export const test = base.extend({
     await use(loginPage);
   },
   credentials: async ({}, use) => {
+    for (const name of ["LOGIN_USER", "LOGIN_PASSWORD"]) {
+      if (!process.env[name]) {
+        throw new Error(`La variable de entorno: ${name} esta vacía`);
+      }
+    }
     await use({
       username: process.env.LOGIN_USER,
       password: process.env.LOGIN_PASSWORD
