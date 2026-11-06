@@ -1,0 +1,13 @@
+{
+  "product": "Bolt Cutters",
+  "billing": {
+    "country": "Austria",
+    "postalCode": "1010",
+    "houseNumber": "98"
+  },
+  "bankTransfer": {
+    "bankName": "BANCOTEST",
+    "accountName": "CUENTA TEST",
+    "accountNumber": "19999999999"
+  }
+}

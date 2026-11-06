@@ -12,7 +12,7 @@ export class ProductPage {
     await this.addCartButton.click();
   }
   //método para abrir el carrito
-  async opencart() {
+  async openCart() {
     await this.cartLink.click();
   }
 }

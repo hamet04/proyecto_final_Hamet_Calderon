@@ -3,7 +3,28 @@ import { LoginPage } from "../pages/LoginPage";
 import { HomePage } from "../pages/HomePage";
 import { CartPage } from "../pages/CartPage";
 import { ProductPage } from "../pages/ProductPage";
+import { CheckoutCartPage } from "../pages/CheckoutCartPage.js";
+import { CheckoutLoginPage } from "../pages/CheckoutLoginPage.js";
+import { BillingPage } from "../pages/BillingPage.js";
+import { PaymentPage } from "../pages/PaymentPage.js";
+import checkoutData from "../test-data/checkout-data.json";
 
+function requireEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Falta la variable ${name} en tu archivo .env`);
+  }
+  return value;
+}
+
+  // Producto en el carrito y checkout iniciado (precondición de varias pruebas).
+async function startCheckoutWithProduct({ homePage, productPage, checkoutCartPage }) {
+  await homePage.openProduct(checkoutData.product);
+  await productPage.addToCart();
+  await expect(productPage.confirmation).toBeVisible();
+  await productPage.openCart();
+  await checkoutCartPage.startCheckout();
+}
 
 export const test = base.extend({
   loginPage: async ({ page }, use) => {
@@ -12,14 +33,9 @@ export const test = base.extend({
     await use(loginPage);
   },
   credentials: async ({}, use) => {
-    for (const name of ["LOGIN_USER", "LOGIN_PASSWORD"]) {
-      if (!process.env[name]) {
-        throw new Error(`La variable de entorno: ${name} esta vacía`);
-      }
-    }
     await use({
-      username: process.env.LOGIN_USER,
-      password: process.env.LOGIN_PASSWORD
+      username: requireEnv("LOGIN_USER"),
+      password: requireEnv("LOGIN_PASSWORD")
     });
   },
   loggedInPage: async ({ page, loginPage, credentials }, use) => {
@@ -37,7 +53,71 @@ export const test = base.extend({
   },
   productPage: async ({ page }, use) => {
     await use(new ProductPage(page));
-  }
+  },
+
+  shopCredentials: async ({}, use) => {
+    await use({
+      user: requireEnv("SHOP_USER"),
+      password: requireEnv("SHOP_PASSWORD"),
+    });
+  },
+
+  checkoutCartPage: async ({ page }, use) => {
+    await use(new CheckoutCartPage(page));
+  },
+
+  checkoutLoginPage: async ({ page }, use) => {
+    await use(new CheckoutLoginPage(page));
+  },
+
+  billingPage: async ({ page }, use) => {
+    await use(new BillingPage(page));
+  },
+
+  paymentPage: async ({ page }, use) => {
+    await use(new PaymentPage(page));
+  },
+
+  // Llega a la pantalla de dirección iniciando sesión por el formulario.
+  checkoutAtBilling: async (
+    { homePage, productPage, checkoutCartPage, checkoutLoginPage, billingPage, shopCredentials },
+    use,
+  ) => {
+    await startCheckoutWithProduct({ homePage, productPage, checkoutCartPage });
+    await checkoutLoginPage.login(shopCredentials.user, shopCredentials.password);
+    await checkoutLoginPage.continueAfterLogin();
+    await billingPage.waitForSavedAddress();
+    await use(billingPage);
+  },
+
+  // Igual, pero sin formulario: exige que el contexto ya traiga la sesión.
+  checkoutAtBillingWithSession: async (
+    { homePage, productPage, checkoutCartPage, checkoutLoginPage, billingPage },
+    use,
+  ) => {
+    await startCheckoutWithProduct({ homePage, productPage, checkoutCartPage });
+    await checkoutLoginPage.continueAfterLogin();
+    await billingPage.waitForSavedAddress();
+    await use(billingPage);
+  },
+
+  // Sesión de la tienda: se inicia sesión UNA vez por worker y se guarda.
+  // La tienda guarda el token en localStorage, y storageState lo captura.
+  shopStorageState: [
+    async ({ browser }, use) => {
+      const context = await browser.newContext({ baseURL: process.env.SHOP_URL });
+      const page = await context.newPage();
+      await page.goto("/auth/login");
+      await page.locator('[data-test="email"]').fill(requireEnv("SHOP_USER"));
+      await page.locator('[data-test="password"]').fill(requireEnv("SHOP_PASSWORD"));
+      await page.locator('[data-test="login-submit"]').click();
+      await expect(page).toHaveURL(/\/account/);
+      const state = await context.storageState();
+      await context.close();
+      await use(state);
+    },
+    { scope: "worker" },
+  ],
 });
 
 export { expect };
