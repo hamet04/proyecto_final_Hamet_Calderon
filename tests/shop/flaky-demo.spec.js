@@ -1,6 +1,6 @@
 import { test, expect } from "../fixtures";
 
-test.use({ baseURL: process.env.SHOP_URL || "https://practicesoftwaretesting.com" });
+test.use({ baseURL: process.env.SHOP_URL });
 
 // Demo de prueba inestable: espera fija. Se ejecuta aparte.
 test("FLAKY-DEMO: buscar con espera fija", async ({ catalogPage }) => {

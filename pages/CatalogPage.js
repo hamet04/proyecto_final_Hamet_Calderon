@@ -9,6 +9,7 @@ export class CatalogPage {
     this.searchCaption = page.locator('[data-test="search-caption"]');
     this.productNames = page.locator('[data-test="product-name"]');
     this.productPrices = page.locator('[data-test="product-price"]');
+    this.element = page.getByRole('link', { name: "Bolt Cutters" });
   }
 
   async goto() {
@@ -23,6 +24,9 @@ export class CatalogPage {
 
   async names() {
     return this.productNames.allTextContents();
+  }
+  async openProduct(name) {
+    await this.page.getByRole('link', { name }).click();
   }
 
   // Search and wait for the API answer that carries the results.

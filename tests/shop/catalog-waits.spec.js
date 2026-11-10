@@ -21,8 +21,8 @@ test.describe("Esperas condicionales en el catalogo", () => {
 
     await expect
       .poll(async () => {
-        const prices = await catalogPage.prices();
-        const sorted = [...prices].sort((a, b) => a - b);
+        const prices = await catalogPage.prices();//[ 10, 20, 30 ]
+        const sorted = [...prices].sort((a, b) => a - b);//[ 10, 20, 30 ]
         return prices.length > 1 && prices.join() === sorted.join();
       })
       .toBe(true);
@@ -50,7 +50,7 @@ test.describe("Esperas condicionales en el catalogo", () => {
 
   test("CP-ESPERA-05: agregar al carrito espera la insignia y el aviso", async ({ catalogPage, page }) => {
     await catalogPage.goto();
-    await catalogPage.productNames.first().click();
+    await catalogPage.openProduct("Bolt Cutters");
     await page.waitForURL(/\/product\//);
 
     await page.locator('[data-test="add-to-cart"]').click();
