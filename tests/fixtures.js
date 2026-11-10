@@ -8,6 +8,7 @@ import { CheckoutLoginPage } from "../pages/CheckoutLoginPage.js";
 import { BillingPage } from "../pages/BillingPage.js";
 import { PaymentPage } from "../pages/PaymentPage.js";
 import checkoutData from "../test-data/checkout-data.json";
+import { CatalogPage } from "../pages/CatalogPage";
 
 function requireEnv(name) {
   const value = process.env[name];
@@ -77,7 +78,9 @@ export const test = base.extend({
   paymentPage: async ({ page }, use) => {
     await use(new PaymentPage(page));
   },
-
+  catalogPage: async ({ page }, use) => {
+    await use(new CatalogPage(page));
+  },
   // Llega a la pantalla de dirección iniciando sesión por el formulario.
   checkoutAtBilling: async (
     { homePage, productPage, checkoutCartPage, checkoutLoginPage, billingPage, shopCredentials },
