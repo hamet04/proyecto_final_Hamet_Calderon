@@ -8,7 +8,6 @@ export class BillingPage {
     this.houseNumber = page.locator('[data-test="house_number"]');
     this.street = page.locator('[data-test="street"]');
     this.city = page.locator('[data-test="city"]');
-    this.state = page.locator('[data-test="state"]');
     this.proceedToPayment = page.locator('[data-test="proceed-3"]');
   }
 

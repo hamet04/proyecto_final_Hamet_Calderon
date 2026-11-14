@@ -47,6 +47,21 @@ test.describe("Checkout", () => {
     await paymentPage.fillBankTransfer(checkoutData.bankTransfer);
     await expect(paymentPage.finishButton).toBeEnabled();
   });
+
+  test("CP-CHECKOUT-05: completar el pedido con varios productos", async ({
+    checkoutAtBillingWithProducts: billingPage, // fixture nueva: el carrito trae 3 productos
+    paymentPage,
+  }) => {
+    test.slow(); 
+    await billingPage.fillBilling(checkoutData.billing);
+    await billingPage.continueToPayment();
+
+    await paymentPage.payWithBankTransfer(checkoutData.bankTransfer);
+    await expect(paymentPage.paymentSuccess).toBeVisible();
+
+    await paymentPage.confirmOrder();
+    await expect(paymentPage.orderConfirmation).toBeVisible();
+  });
 });
 
 testWithSession.describe("Checkout con la sesión guardada", () => {

@@ -1,5 +1,7 @@
+// expect viene de Playwright: se usa en goto() para esperar a que el catálogo cargue.
 import { expect } from "@playwright/test";
 
+// Un Page Object agrupa los selectores y las acciones de una pantalla (el catálogo).
 export class CatalogPage {
   constructor(page) {
     this.page = page;
@@ -9,7 +11,7 @@ export class CatalogPage {
     this.searchCaption = page.locator('[data-test="search-caption"]');
     this.productNames = page.locator('[data-test="product-name"]');
     this.productPrices = page.locator('[data-test="product-price"]');
-    this.element = page.getByRole('link', { name: "Bolt Cutters" });
+    // Se eliminó this.element: tenía un producto fijo y nadie lo usaba.
   }
 
   async goto() {
@@ -18,18 +20,24 @@ export class CatalogPage {
   }
 
   async prices() {
-    const texts = await this.productPrices.allTextContents();
-    return texts.map((text) => Number(text.replace("$", "")));
+    const texts = await this.productPrices.allTextContents(); // los textos, por ejemplo "$14.15"
+    // /[^0-9.]/g = todo lo que NO sea dígito o punto. "$1,000.00" -> "1000.00"; Number() lo vuelve número.
+    return texts.map((text) => Number(text.replace(/[^0-9.]/g, "")));
   }
 
   async names() {
     return this.productNames.allTextContents();
   }
   async openProduct(name) {
-    await this.page.getByRole('link', { name }).click();
+    //    await this.page.getByRole('link', { name }).click();
+    // filter({ hasText: regex }) se queda con los nombres cuyo texto coincide con la expresión.
+    // ^ = inicio, $ = fin, \s* = espacios opcionales: el nombre debe ser exacto, no parcial.
+    const exactName = this.productNames.filter({ hasText: new RegExp(`^\\s*${name}\\s*$`) });
+    // getByRole("link").filter({ has: ... }) = el enlace que contiene ese nombre exacto.
+    await this.page.getByRole("link").filter({ has: exactName }).click();
   }
 
-  // Search and wait for the API answer that carries the results.
+  // Busca y espera la respuesta de la API que trae los resultados (S18).
   async search(term) {
     await this.searchBox.fill(term);
     const response = this.page.waitForResponse(

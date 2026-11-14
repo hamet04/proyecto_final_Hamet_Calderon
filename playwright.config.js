@@ -2,6 +2,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import env from 'dotenv';
 env.config();
+const random = new Date().toISOString().replace(/[-:.]/g, "");
 
 /**
  * Read environment variables from file.
@@ -27,8 +28,9 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ["list"], // una línea por prueba en la terminal
-    ["html", { outputFolder: "playwright-report", open: "never" }], // reporte web; open:"never" evita que se abra solo
-    ["json", { outputFile: "results.json" }], // mismos resultados en JSON (para revisarlos con código)
+    ["html", { outputFolder: `reportes/${random}`, open: "never" }], // reporte web; open:"never" evita que se abra solo
+    ["json", { outputFile: `reportes/${random}/results.json` }], // mismos resultados en JSON (para revisarlos con código)
+    ["allure-playwright", { resultsDir: "allure-results" }], // guarda los resultados crudos en la carpeta allure-results
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

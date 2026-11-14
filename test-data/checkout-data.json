@@ -1,5 +1,6 @@
 {
   "product": "Bolt Cutters",
+  "products": ["Bolt Cutters", "Combination Pliers", "Thor Hammer"],
   "billing": {
     "country": "Austria",
     "postalCode": "1010",

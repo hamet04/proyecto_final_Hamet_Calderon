@@ -18,13 +18,23 @@ function requireEnv(name) {
   return value;
 }
 
-  // Producto en el carrito y checkout iniciado (precondición de varias pruebas).
-async function startCheckoutWithProduct({ homePage, productPage, checkoutCartPage }) {
-  await homePage.openProduct(checkoutData.product);
-  await productPage.addToCart();
-  await expect(productPage.confirmation).toBeVisible();
+// Agrega cada producto de la lista al carrito y empieza el checkout.
+// Recibe las fixtures que necesita y la lista de nombres de producto.
+async function startCheckoutWithProducts({ homePage, productPage, checkoutCartPage }, products) {
+  // entries() da [posición, nombre] para cada producto de la lista.
+  for (const [index, name] of products.entries()) {
+    // La fixture homePage ya abrió el catálogo; para los siguientes productos hay que volver a él.
+    if (index > 0) await homePage.goto();
+    await homePage.openProduct(name);
+    await productPage.addToCart();
+    await expect(productPage.confirmation).toBeVisible(); // el aviso confirma que se agregó
+  }
   await productPage.openCart();
   await checkoutCartPage.startCheckout();
+}
+
+async function startCheckoutWithProduct(fixtures) {
+  await startCheckoutWithProducts(fixtures, [checkoutData.product]);
 }
 
 export const test = base.extend({
@@ -87,6 +97,18 @@ export const test = base.extend({
     use,
   ) => {
     await startCheckoutWithProduct({ homePage, productPage, checkoutCartPage });
+    await checkoutLoginPage.login(shopCredentials.user, shopCredentials.password);
+    await checkoutLoginPage.continueAfterLogin();
+    await billingPage.waitForSavedAddress();
+    await use(billingPage);
+  },
+
+  // Igual que checkoutAtBilling, pero con todos los productos de checkout-data.json (products).
+  checkoutAtBillingWithProducts: async (
+    { homePage, productPage, checkoutCartPage, checkoutLoginPage, billingPage, shopCredentials },
+    use,
+  ) => {
+    await startCheckoutWithProducts({ homePage, productPage, checkoutCartPage }, checkoutData.products);
     await checkoutLoginPage.login(shopCredentials.user, shopCredentials.password);
     await checkoutLoginPage.continueAfterLogin();
     await billingPage.waitForSavedAddress();

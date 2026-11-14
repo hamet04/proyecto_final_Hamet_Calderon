@@ -9,3 +9,7 @@ node_modules/
 .env
 /prueba/
 results.json
+reportes/
+allure-results/
+allure-report/
+allure-history.jsonl
